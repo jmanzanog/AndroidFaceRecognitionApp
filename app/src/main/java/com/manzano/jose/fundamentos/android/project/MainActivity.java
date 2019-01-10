@@ -5,19 +5,16 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,6 +23,7 @@ import android.widget.RelativeLayout;
 
 import com.google.gson.Gson;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -80,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
         //p.setAnchorId(View.NO_ID);
         fab.setLayoutParams(p);
         fab.setVisibility(View.GONE);
+        detectionProgressDialog = new ProgressDialog(this);
+        detectionProgressDialog.setMessage("Procesando Imagen");
     }
 
     @Override
@@ -88,18 +88,17 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK &&
                 data != null && data.getData() != null) {
             Uri uri = data.getData();
-
-
             try {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(
                         getContentResolver(), uri);
-
+                Bitmap bitmap2 = null;
+                if (bitmap.getByteCount() > 1000000) {
+                    bitmap2 = getResizedBitmap(bitmap, 1280);
+                }
                 ImageView imageView = findViewById(R.id.imageView1);
-                imageView.setImageBitmap(bitmap);
-
-                // Comment out for tutorial
-                detectAndFrame(bitmap);
-
+                imageView.setImageBitmap(bitmap2 == null ? bitmap : bitmap2);
+                detectAndFrame(bitmap2 == null ? bitmap : bitmap2);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -107,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void detectAndFrame(Bitmap bitmap) throws IOException {
+        detectionProgressDialog.show();
         File file = saveBitmap(bitmap, this.getCacheDir().getPath() + Calendar.getInstance().getTimeInMillis());
         doRequest(file, bitmap);
     }
@@ -118,10 +118,8 @@ public class MainActivity extends AppCompatActivity {
             try {
                 FileOutputStream outputStream = null;
                 try {
-                    outputStream = new FileOutputStream(path); //here is set your file path where you want to save or also here you can set file object directly
-
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream); // bitmap is your Bitmap instance, if you want to compress it you can compress reduce percentage
-                    // PNG is a lossless format, the compression factor (100) is ignored
+                    outputStream = new FileOutputStream(path);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream); //
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -155,11 +153,13 @@ public class MainActivity extends AppCompatActivity {
 
         client.newCall(request).enqueue(new Callback() {
             public void onFailure(Call call, IOException e) {
+                detectionProgressDialog.dismiss();
                 Log.e(MainActivity.class.getName(), "Falló Request");
             }
 
             public void onResponse(Call call, Response response) throws IOException {
                 if (!response.isSuccessful()) {
+                    detectionProgressDialog.dismiss();
                     Log.e(MainActivity.class.getName(), "Falló Request");
                 } else {
                     jsonResponse = response.body().string();
@@ -176,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
                                                 dialog.dismiss();
                                             }
                                         });
+                                detectionProgressDialog.dismiss();
                                 alertDialog.show();
                             }
                         });
@@ -194,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
                                 fab.setVisibility(View.VISIBLE);
                                 imageView.setImageBitmap(drawFaceRectanglesOnBitmap(bitmap, tempFaces));
                                 bitmap.recycle();
+                                detectionProgressDialog.dismiss();
                             }
                         });
                     }
@@ -225,5 +227,23 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return bitmap;
+    }
+
+    public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float) width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        return Bitmap.createScaledBitmap(image,
+                width,
+                height,
+                true);
     }
 }
