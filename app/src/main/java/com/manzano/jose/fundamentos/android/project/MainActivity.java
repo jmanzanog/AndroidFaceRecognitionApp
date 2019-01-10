@@ -1,6 +1,9 @@
 package com.manzano.jose.fundamentos.android.project;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -9,12 +12,17 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.google.gson.Gson;
 
@@ -34,11 +42,15 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
     private final int PICK_IMAGE = 1;
     private ProgressDialog detectionProgressDialog;
+    private Context context;
+    private String jsonResponse;
 
+    @SuppressLint("RestrictedApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.context = this;
 
         Button button1 = findViewById(R.id.button1);
         button1.setOnClickListener(new View.OnClickListener() {
@@ -50,6 +62,24 @@ public class MainActivity extends AppCompatActivity {
                         intent, "Select Picture"), PICK_IMAGE);
             }
         });
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                /*Snackbar.make(view, "Here's a Snackbar", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();*/
+               /* Intent intent = new Intent(context,DetailImageActivity.class);
+                startActivity(intent);*/
+                Intent intent = new Intent(context, CardViewActivity.class);
+                intent.putExtra("jsonResponse", jsonResponse);
+                startActivity(intent);
+            }
+        });
+        RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) fab.getLayoutParams();
+        //p.setAnchorId(View.NO_ID);
+        fab.setLayoutParams(p);
+        fab.setVisibility(View.GONE);
     }
 
     @Override
@@ -130,13 +160,45 @@ public class MainActivity extends AppCompatActivity {
 
             public void onResponse(Call call, Response response) throws IOException {
                 if (!response.isSuccessful()) {
-                    System.out.println("respuesta fallida");
+                    Log.e(MainActivity.class.getName(), "Falló Request");
                 } else {
-                    Face[] tempFaces = (new Gson()).fromJson(response.body().string(), Face[].class);
-                    Log.d("print", (new Gson().toJson(tempFaces)));
-                    ImageView imageView = findViewById(R.id.imageView1);
-                    imageView.setImageBitmap(drawFaceRectanglesOnBitmap(bitmap, tempFaces));
-                    bitmap.recycle();
+                    jsonResponse = response.body().string();
+                    if (jsonResponse.equals("[]")) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                                alertDialog.setTitle("Advertencia");
+                                alertDialog.setMessage("No se ha detectado rostro en la imagen, por favor intente con otra imagen");
+                                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                alertDialog.show();
+                            }
+                        });
+
+                    } else {
+                        final Face[] tempFaces = (new Gson()).fromJson(jsonResponse, Face[].class);
+                        Log.d("print", jsonResponse);
+                        final ImageView imageView = findViewById(R.id.imageView1);
+                        runOnUiThread(new Runnable() {
+                            @SuppressLint("RestrictedApi")
+                            @Override
+                            public void run() {
+                                FloatingActionButton fab = findViewById(R.id.fab);
+                                RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) fab.getLayoutParams();
+                                fab.setLayoutParams(p);
+                                fab.setVisibility(View.VISIBLE);
+                                imageView.setImageBitmap(drawFaceRectanglesOnBitmap(bitmap, tempFaces));
+                                bitmap.recycle();
+                            }
+                        });
+                    }
+
+
                 }
             }
         });

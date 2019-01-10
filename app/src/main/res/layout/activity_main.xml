@@ -12,7 +12,16 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Browse for a face image"
+        android:text="Analizar una imagen con rostro"
         android:id="@+id/button1"
         android:layout_alignParentBottom="true"/>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:src="@drawable/detail"
+        android:layout_margin="16dp"
+        />
+
 </RelativeLayout>
