@@ -1,4 +1,4 @@
-package com.manzano.jose.fundamentos.android.project;
+package com.manzano.jose.fundamentos.android.project.view;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
@@ -20,15 +20,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-
 import com.google.gson.Gson;
-
+import com.manzano.jose.fundamentos.android.project.model.Face;
+import com.manzano.jose.fundamentos.android.project.model.FaceRectangle;
+import com.manzano.jose.fundamentos.android.project.R;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -65,10 +65,6 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*Snackbar.make(view, "Here's a Snackbar", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();*/
-               /* Intent intent = new Intent(context,DetailImageActivity.class);
-                startActivity(intent);*/
                 Intent intent = new Intent(context, CardViewActivity.class);
                 intent.putExtra("jsonResponse", jsonResponse);
                 startActivity(intent);

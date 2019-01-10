@@ -18,13 +18,13 @@
  *
  */
 
-package com.manzano.jose.fundamentos.android.project;
+package com.manzano.jose.fundamentos.android.project.model;
 
 public class DataObject {
     private String mText1;
     private String mText2;
 
-    DataObject (String text1, String text2){
+    public DataObject(String text1, String text2){
         mText1 = text1;
         mText2 = text2;
     }

@@ -1,4 +1,4 @@
-package com.manzano.jose.fundamentos.android.project;
+package com.manzano.jose.fundamentos.android.project.model;
 
 public class FeatureCoordinate {
     public double x;

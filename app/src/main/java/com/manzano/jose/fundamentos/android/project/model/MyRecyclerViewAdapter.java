@@ -18,7 +18,7 @@
  *
  */
 
-package com.manzano.jose.fundamentos.android.project;
+package com.manzano.jose.fundamentos.android.project.model;
 
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -26,6 +26,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.manzano.jose.fundamentos.android.project.R;
 
 import java.util.ArrayList;
 

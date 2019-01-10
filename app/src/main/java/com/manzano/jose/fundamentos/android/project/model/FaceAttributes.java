@@ -1,5 +1,5 @@
 
-package com.manzano.jose.fundamentos.android.project;
+package com.manzano.jose.fundamentos.android.project.model;
 
 import java.util.List;
 import com.google.gson.annotations.Expose;
