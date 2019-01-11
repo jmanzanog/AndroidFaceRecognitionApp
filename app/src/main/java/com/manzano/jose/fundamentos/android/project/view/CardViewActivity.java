@@ -89,6 +89,9 @@ public class CardViewActivity extends AppCompatActivity {
     }
 
     private String getAccesories(List<Object> objects) {
+        if (objects==null||objects.size()==0){
+            return  "Ninguno";
+        }
         String accesorios = "";
         if (null != objects && objects.size() > 0) {
             for (Object obj : objects) {
@@ -102,6 +105,10 @@ public class CardViewActivity extends AppCompatActivity {
     }
 
     private String getMayorEmotion(Emotion emotion) {
+
+        if (emotion==null){
+            return "Indeterminado";
+        }
         Map mapEmotion = new HashMap();
         ValueComparator bvc = new ValueComparator(mapEmotion);
         TreeMap<String, Double> sorted_map = new TreeMap<String, Double>(bvc);
@@ -120,6 +127,9 @@ public class CardViewActivity extends AppCompatActivity {
     }
 
     private String getMayorHairColor(List<HairColor> listHairColor) {
+        if (listHairColor== null || listHairColor.size() ==0){
+            return "Indeterminado";
+        }
         Map hairColorMap = new HashMap();
         ValueComparator bvc = new ValueComparator(hairColorMap);
         TreeMap<String, Double> sorted_map = new TreeMap<String, Double>(bvc);
