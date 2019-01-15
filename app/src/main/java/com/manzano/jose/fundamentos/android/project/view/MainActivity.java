@@ -140,9 +140,9 @@ public class MainActivity extends AppCompatActivity {
                 file);
 
         Request request = new Request.Builder()
-                .url("https://westcentralus.api.cognitive.microsoft.com/face/v1.0/detect?returnFaceId=true&returnFaceLandmarks=false&returnFaceAttributes=age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise")
+                .url("https://centralus.api.cognitive.microsoft.com/face/v1.0/detect?returnFaceId=true&returnFaceLandmarks=false&returnFaceAttributes=age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise")
                 .post(body)
-                .addHeader("Ocp-Apim-Subscription-Key", "1d88f949af3443ea8cc16b7146bd7501")
+                .addHeader("Ocp-Apim-Subscription-Key", "61a8938ed09c462b85ed7fda264ec04c")
                 .addHeader("Content-Type", "application/json")
                 .addHeader("cache-control", "no-cache")
                 .build();
